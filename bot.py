@@ -166,7 +166,7 @@ async def show_project(callback: types.CallbackQuery):
     )
     
     # Получаем путь к картинке
-    image_path = project.get("telegram_bot_portfolio/screens")
+    image_path = project.get("screens")
     
     if image_path:
         # Формируем полный путь к картинке (от корня проекта)
