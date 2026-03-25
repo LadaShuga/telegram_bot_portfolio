@@ -34,7 +34,9 @@ async def start(message: types.Message):
     await message.answer(
         "👋 Привет! Я бот-портфолио.\n\n"
         "📁 Используй /portfolio чтобы посмотреть мои работы.\n"
-        "💼 Здесь собраны все мои проекты с описаниями и скриншотами."
+        "💼 Здесь собраны все мои проекты с описаниями и скриншотами.\n\n"
+        "💰 Также я могу рассчитать стоимость и сроки разработки.\n"
+        "Просто напиши, какой проект тебя заинтересовал!"
     )
     logger.info(f"Пользователь {message.from_user.id} запустил бота")
 
@@ -60,16 +62,13 @@ async def portfolio(message: types.Message):
         # Отправляем каждый проект
         for idx, project in enumerate(projects, 1):
             # Формируем текст проекта
-            text = f"*{idx}. {project['title']}*\n\n{project['description']}"
-            
-            # Добавляем технологии, если есть
-            if project.get('technologies'):
-                tech_str = ", ".join(project['technologies'])
-                text += f"\n\n🔧 *Технологии:* {tech_str}"
-            
-            # Добавляем ссылку, если есть
-            if project.get('link'):
-                text += f"\n\n🔗 [Ссылка на проект]({project['link']})"
+            text = (
+                f"*{idx}. {project['title']}*\n\n"
+                f"📝 {project['description']}\n\n"
+                f"🔧 *Технологии:* {project['technologies']}\n"
+                f"💰 *Стоимость:* {project['price']}\n"
+                f"⏱ *Срок:* {project['duration']}"
+            )
             
             # Проверяем наличие фото
             if project.get('photo'):
@@ -106,7 +105,8 @@ async def portfolio(message: types.Message):
         # Отправляем завершающее сообщение
         await message.answer(
             "✅ Все проекты показаны!\n\n"
-            "Спасибо за внимание! 🙌"
+            "💬 Если вас заинтересовал какой-то проект, "
+            "напишите /contact для связи со мной!"
         )
         
     except Exception as e:
@@ -117,6 +117,20 @@ async def portfolio(message: types.Message):
         )
 
 
+@dp.message(Command("contact"))
+async def contact(message: types.Message):
+    """Обработчик команды /contact"""
+    await message.answer(
+        "📱 *Связаться со мной:*\n\n"
+        "✉️ Email: ladashuga@mail.ru\n"
+        "💬 Telegram:@shuga_dev\n"
+        "📱 Phone: +7 (964) 469-16-50\n\n"
+        "💼 GitHub: https://github.com/LadaShuga\n\n"
+        "Буду рад ответить на ваши вопросы! 🤝",
+        parse_mode="Markdown"
+    )
+
+
 @dp.message()
 async def handle_unknown(message: types.Message):
     """Обработчик неизвестных команд"""
@@ -124,7 +138,8 @@ async def handle_unknown(message: types.Message):
         "🤔 Я не понимаю эту команду.\n\n"
         "Используйте:\n"
         "/start - приветствие\n"
-        "/portfolio - посмотреть портфолио"
+        "/portfolio - посмотреть портфолио\n"
+        "/contact - связаться со мной"
     )
 
 
