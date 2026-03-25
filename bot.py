@@ -54,7 +54,7 @@ def portfolio_keyboard():
 def project_keyboard(project_key):
     """Клавиатура для конкретного проекта"""
     buttons = [
-        [InlineKeyboardButton(text="📨 Заказать такой же", url="https://t.me/lada_pieceof_hell")],
+        [InlineKeyboardButton(text="📨 Заказать такой же", url="https://t.me/shuga_dev")],
         [InlineKeyboardButton(text="🔙 К списку проектов", callback_data="back_to_portfolio")],
         [InlineKeyboardButton(text="🏠 Главное меню", callback_data="back_to_main")]
     ]
