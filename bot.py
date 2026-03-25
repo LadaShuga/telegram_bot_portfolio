@@ -7,9 +7,14 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
-# Наши локальные файлы
-from config import BOT_TOKEN, ADMIN_IDS
 from portfolio import PORTFOLIO
+# Берем токен из переменных окружения
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+if not BOT_TOKEN:
+    logger.error("BOT_TOKEN не найден в переменных окружения!")
+    exit(1)
+
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
