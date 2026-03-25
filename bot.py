@@ -1,13 +1,21 @@
-import asyncio
-import logging
 import os
-from aiogram import Bot, Dispatcher, types, F
+import logging
+from pathlib import Path
+from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
+from aiogram.types import FSInputFile
+from portfolio import get_portfolio
 
-from portfolio import PORTFOLIO
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Получаем абсолютный путь к папке со скриптом
+BASE_DIR = Path(__file__).parent
+
 # Берем токен из переменных окружения
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
@@ -15,253 +23,111 @@ if not BOT_TOKEN:
     logger.error("BOT_TOKEN не найден в переменных окружения!")
     exit(1)
 
-
-# Настройка логирования
-logging.basicConfig(level=logging.INFO)
-
-# Создание бота
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+# Инициализация бота
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# ----- КЛАВИАТУРЫ -----
-def main_keyboard():
-    """Главное меню"""
-    buttons = [
-        [InlineKeyboardButton(text="👨‍💻 Обо мне", callback_data="about")],
-        [InlineKeyboardButton(text="📂 Портфолио", callback_data="portfolio")],
-        [InlineKeyboardButton(text="📞 Контакты", callback_data="contacts")]
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-def portfolio_keyboard():
-    """Список проектов"""
-    buttons = []
-    for key, project in PORTFOLIO.items():
-        buttons.append([InlineKeyboardButton(text=project["name"], callback_data=f"project_{key}")])
-    buttons.append([InlineKeyboardButton(text="🔙 На главную", callback_data="back_to_main")])
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-def project_keyboard(project_key):
-    """Клавиатура для конкретного проекта"""
-    buttons = [
-        [InlineKeyboardButton(text="📨 Заказать такой же", url="https://t.me/lada_pieceof_hell")],  # Замените на свой
-        [InlineKeyboardButton(text="🔙 К списку проектов", callback_data="back_to_portfolio")],  # Изменено!
-        [InlineKeyboardButton(text="🏠 Главное меню", callback_data="back_to_main")]
-    ]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-def back_keyboard():
-    """Кнопка 'Назад' на главную"""
-    buttons = [[InlineKeyboardButton(text="🔙 На главную", callback_data="back_to_main")]]
-    return InlineKeyboardMarkup(inline_keyboard=buttons)
-
-# ----- ОБРАБОТЧИКИ КОМАНД -----
 @dp.message(Command("start"))
-async def cmd_start(message: types.Message):
-    """Приветствие"""
-    text = (
-        "<b>👋 Привет! Меня зовут Лада и я разработчик Telegram-ботов</b>\n\n"
-        "Создаю профессиональные боты для бизнеса и не только.\n"
-        "В портфолио - реальные проекты с примерами работ.\n\n"
-        "<i>Выберите интересующий раздел:</i>"
+async def start(message: types.Message):
+    """Обработчик команды /start"""
+    await message.answer(
+        "👋 Привет! Я бот-портфолио.\n\n"
+        "📁 Используй /portfolio чтобы посмотреть мои работы.\n"
+        "💼 Здесь собраны все мои проекты с описаниями и скриншотами."
     )
-    
-    # Пробуем отправить фото, если есть
+    logger.info(f"Пользователь {message.from_user.id} запустил бота")
+
+
+@dp.message(Command("portfolio"))
+async def portfolio(message: types.Message):
+    """Обработчик команды /portfolio - показывает все проекты"""
     try:
-        photo = types.FSInputFile("portfolio/telegram_bot_portfolio/screens/avatar.jpg")
-        await message.answer_photo(photo=photo, caption=text, reply_markup=main_keyboard())
-    except:
-        await message.answer(text, reply_markup=main_keyboard())
-
-    
-# ----- ОБРАБОТЧИКИ КНОПОК -----
-@dp.callback_query(F.data == "about")
-async def about(callback: types.CallbackQuery):
-    """Информация о разработчике"""
-    text = (
-        "<b>👨‍💻 Обо мне</b>\n\n"
-        "<b>Чем занимаюсь:</b>\n"
-        "• Разработка Telegram ботов различной сложности\n"
-        "• Парсинг данных и автоматизация\n"
-        "• Системы бронирования и записи\n"
-        "• Интеграция с базами данных\n\n"
+        # Получаем список проектов из portfolio.py
+        projects = get_portfolio()
         
-        "<b>Мой стек:</b>\n"
-        "• Python / aiogram\n"
-        "• SQLite / PostgreSQL\n"
-        "• Парсинг (BeautifulSoup, Selenium)\n"
-        "• Планировщики задач (APScheduler)\n\n"
+        if not projects:
+            await message.answer("❌ Проекты не найдены.")
+            logger.warning("Список проектов пуст")
+            return
         
-        "<b>Могу создать шаблон/референс графического наполнения</b> \n"
+        # Отправляем приветственное сообщение
+        await message.answer(
+            f"📁 Всего проектов: {len(projects)}\n\n"
+            "⬇️ Вот мои работы:"
+        )
         
-        "<b>Почему Я?:</b>\n"
-        "✅ Четкое соблюдение сроков\n"
-        "✅ Понятная документация\n"
-        "✅ Поддержка после сдачи"
-    )
-    
-    # ВАЖНО: Проверяем тип сообщения
-    try:
-        if callback.message.photo:
-            # Если это сообщение с фото - отправляем новое текстовое
-            await callback.message.answer(text, reply_markup=back_keyboard())
-        else:
-            # Если это текстовое - редактируем
-            await callback.message.edit_text(text, reply_markup=back_keyboard())
-    except Exception as e:
-        # Если ошибка - отправляем новое сообщение
-        print(f"Ошибка в about: {e}")
-        await callback.message.answer(text, reply_markup=back_keyboard())
-    
-    await callback.answer()
-
-@dp.callback_query(F.data == "portfolio")
-async def show_portfolio(callback: types.CallbackQuery):
-    """Список проектов"""
-    text = "<b>📂 Мои проекты</b>\n\nВыберите проект, чтобы посмотреть детали и примеры работ:"
-    
-    # Проверяем тип сообщения
-    if callback.message.photo:
-        # Если это сообщение с фото - отправляем новое текстовое
-        await callback.message.answer(text, reply_markup=portfolio_keyboard())
-    else:
-        # Если это текстовое - редактируем
-        await callback.message.edit_text(text, reply_markup=portfolio_keyboard())
-    
-    await callback.answer()
-
-@dp.callback_query(F.data == "back_to_portfolio")  # НОВЫЙ ОБРАБОТЧИК!
-async def back_to_portfolio(callback: types.CallbackQuery):
-    """Возврат к списку проектов (специально для сообщений с фото)"""
-    text = "<b>📂 Мои проекты</b>\n\nВыберите проект, чтобы посмотреть детали и примеры работ:"
-    
-    # Всегда отправляем новое сообщение, чтобы не запутаться с типами
-    await callback.message.answer(text, reply_markup=portfolio_keyboard())
-    await callback.answer("👆 Список проектов")
-
-@dp.callback_query(F.data.startswith("project_"))
-async def show_project(callback: types.CallbackQuery):
-    """Детали конкретного проекта с картинкой"""
-    project_key = callback.data.replace("project_", "")
-    project = PORTFOLIO.get(project_key)
-    
-    if not project:
-        await callback.answer("Проект не найден", show_alert=True)
-        return
-    
-    # Формируем описание проекта
-    text = (
-        f"<b>{project['name']}</b>\n\n"
-        f"📝 <b>Описание:</b> {project['description']}\n\n"
-        f"⚙️ <b>Технологии:</b> {project.get('tech', 'Не указано')}\n"
-        f"⏱️ <b>Срок разработки:</b> {project.get('duration', 'По запросу')}\n"
-        f"💰 <b>Стоимость:</b> {project.get('price', 'Договорная')}\n\n"
-        f"<i>Хотите такой же бот? Напишите мне!</i>"
-    )
-    
-    # Получаем путь к картинке
-    image_path = project.get("screens")
-    
-    if image_path and os.path.exists(image_path):
-        try:
-            # Отправляем новое сообщение с фото
-            photo = types.FSInputFile(image_path)
+        # Отправляем каждый проект
+        for idx, project in enumerate(projects, 1):
+            # Формируем текст проекта
+            text = f"*{idx}. {project['title']}*\n\n{project['description']}"
             
-            await callback.message.answer_photo(
-                photo=photo,
-                caption=text,
-                reply_markup=project_keyboard(project_key)
-            )
+            # Добавляем технологии, если есть
+            if project.get('technologies'):
+                tech_str = ", ".join(project['technologies'])
+                text += f"\n\n🔧 *Технологии:* {tech_str}"
             
-            await callback.answer("👍 Вот детали проекта")
+            # Добавляем ссылку, если есть
+            if project.get('link'):
+                text += f"\n\n🔗 [Ссылка на проект]({project['link']})"
             
-        except Exception as e:
-            print(f"Ошибка при отправке картинки: {e}")
-            # Если ошибка с картинкой, показываем текст
-            await callback.message.answer(text, reply_markup=project_keyboard(project_key))
-            await callback.answer()
-    else:
-        # Если картинки нет - отправляем текст
-        if image_path and not os.path.exists(image_path):
-            print(f"Файл {image_path} не найден")
-        
-        await callback.message.answer(text, reply_markup=project_keyboard(project_key))
-        await callback.answer()
-
-@dp.callback_query(F.data == "contacts")
-async def contacts(callback: types.CallbackQuery):
-    """Контакты"""
-    text = (
-        "<b>📞 Контакты</b>\n\n"
-        "📱 <b>Telegram:</b> @shuga_dev\n"
-        "📧 <b>Email:</b> ladashuga@mail.ru\n"
-        "💼 <b>GitHub:</b> https://github.com/LadaShuga\n\n"
-        
-        
-        
-        "<i>Пишите, буду рада обсудить ваш проект!</i>"
-    )
-    
-    if callback.message.photo:
-        await callback.message.answer(text, reply_markup=back_keyboard())
-    else:
-        await callback.message.edit_text(text, reply_markup=back_keyboard())
-    
-    await callback.answer()
-
-@dp.callback_query(F.data == "back_to_main")
-async def back_to_main(callback: types.CallbackQuery):
-    """Возврат в главное меню"""
-    text = "<b>🏠 Главное меню</b>\n\nЧем я могу вам помочь?"
-    
-    if callback.message.photo:
-        await callback.message.answer(text, reply_markup=main_keyboard())
-    else:
-        await callback.message.edit_text(text, reply_markup=main_keyboard())
-    
-    await callback.answer()
-
-# ----- ЗАПУСК БОТА -----
-async def main():
-    """Запуск бота"""
-    print("🚀 Бот-визитка запущен!")
-    print("=" * 40)
-    
-    try:
-        me = await bot.me()
-        print(f"📱 Бот: @{me.username}")
-    except:
-        print("📱 Бот: (не удалось получить username)")
-    
-    print("\n📸 Проверка картинок в портфолио:")
-    all_ok = True
-    
-    for key, project in PORTFOLIO.items():
-        image_path = project.get("screens")
-        if image_path:
-            if os.path.exists(image_path):
-                print(f"  ✅ {project['name']}: {image_path}")
+            # Проверяем наличие фото
+            if project.get('photo'):
+                # Формируем полный путь к файлу
+                photo_path = BASE_DIR / "screens" / project['photo']
+                
+                if photo_path.exists():
+                    try:
+                        # Отправляем фото с подписью
+                        photo_file = FSInputFile(photo_path)
+                        await message.answer_photo(
+                            photo_file,
+                            caption=text,
+                            parse_mode="Markdown"
+                        )
+                        logger.info(f"Отправлен проект {idx}: {project['title']} с фото {project['photo']}")
+                    except Exception as e:
+                        logger.error(f"Ошибка при отправке фото {photo_path}: {e}")
+                        await message.answer(
+                            text + "\n\n❌ Не удалось загрузить фото",
+                            parse_mode="Markdown"
+                        )
+                else:
+                    logger.warning(f"Фото не найдено: {photo_path}")
+                    await message.answer(
+                        text + "\n\n❌ Фото временно недоступно",
+                        parse_mode="Markdown"
+                    )
             else:
-                print(f"  ❌ {project['name']}: ФАЙЛ НЕ НАЙДЕН! {image_path}")
-                all_ok = False
-        else:
-            print(f"  ⚠️ {project['name']}: путь к картинке не указан")
-            all_ok = False
-    
-    if not all_ok:
-        print("\n⚠️  ВНИМАНИЕ: Некоторые картинки не найдены!")
-        print("Проверьте пути в portfolio.py и наличие файлов в папке screens/")
-    else:
-        print("\n✅ Все картинки найдены!")
-    
-    print("\n" + "=" * 40)
-    print("🎉 Бот готов к работе!")
-    print("=" * 40)
-    
-    await dp.start_polling(bot)
+                # Если фото нет, отправляем только текст
+                await message.answer(text, parse_mode="Markdown")
+                logger.info(f"Отправлен проект {idx}: {project['title']} (без фото)")
+        
+        # Отправляем завершающее сообщение
+        await message.answer(
+            "✅ Все проекты показаны!\n\n"
+            "Спасибо за внимание! 🙌"
+        )
+        
+    except Exception as e:
+        logger.error(f"Ошибка при отправке портфолио: {e}")
+        await message.answer(
+            "❌ Произошла ошибка при загрузке портфолио.\n"
+            "Попробуйте позже или обратитесь к администратору."
+        )
 
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\n❌ Бот остановлен")
+
+@dp.message()
+async def handle_unknown(message: types.Message):
+    """Обработчик неизвестных команд"""
+    await message.answer(
+        "🤔 Я не понимаю эту команду.\n\n"
+        "Используйте:\n"
+        "/start - приветствие\n"
+        "/portfolio - посмотреть портфолио"
+    )
+
+
+if __name__ == '__main__':
+    logger.info("Бот запущен и готов к работе!")
+    dp.run_polling(bot)
