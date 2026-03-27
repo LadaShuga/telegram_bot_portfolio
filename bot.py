@@ -3,8 +3,10 @@ import logging
 import os
 from pathlib import Path
 from aiogram import Bot, Dispatcher, types, F
-from aiogram.filters import Command
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile
+from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 
@@ -29,13 +31,34 @@ logger = logging.getLogger(__name__)
 # Импортируем портфолио и категории
 from portfolio import PORTFOLIO, BOT_PROJECTS, DESIGN_PROJECTS
 
-# Создание бота
+# Создание бота и хранилища для FSM
+storage = MemoryStorage()
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+dp = Dispatcher(storage=storage)
 
 # ----- КЛАВИАТУРЫ -----
-def main_keyboard():
-    """Главное меню"""
+
+def start_keyboard():
+    """Клавиатура с кнопкой 'Начать' (Reply-клавиатура)"""
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🚀 Начать")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+    return keyboard
+
+def remove_keyboard():
+    """Убирает клавиатуру"""
+    return ReplyKeyboardMarkup(
+        keyboard=[[]],
+        resize_keyboard=True,
+        one_time_keyboard=True
+    )
+
+def main_inline_keyboard():
+    """Главное инлайн-меню"""
     buttons = [
         [InlineKeyboardButton(text="👨‍💻 Обо мне", callback_data="about")],
         [InlineKeyboardButton(text="🤖 Разработка ботов", callback_data="category_bot")],
@@ -86,24 +109,25 @@ def project_keyboard(project_key, project):
     
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-def back_keyboard():
-    """Кнопка 'Назад' на главную"""
+def back_inline_keyboard():
+    """Инлайн-кнопка 'Назад' на главную"""
     buttons = [[InlineKeyboardButton(text="🔙 На главную", callback_data="back_to_main")]]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 # ----- ОБРАБОТЧИКИ КОМАНД -----
-@dp.message(Command("start"))
+@dp.message(CommandStart())
 async def cmd_start(message: types.Message):
-    """Приветствие"""
+    """Приветствие с кнопкой 'Начать'"""
     text = (
-        "<b>👋 Привет! Меня зовут Лада</b>\n\n"
+        "<b>👋 Добро пожаловать!</b>\n\n"
+        "Меня зовут <b>Лада</b>.\n\n"
         "Я <b>разработчик Telegram-ботов</b> и <b>дизайнер</b>.\n\n"
         "📌 <b>Чем могу быть полезна:</b>\n"
         "• 🤖 Разработка ботов для бизнеса\n"
         "• 🎨 Дизайн карточек товаров для маркетплейсов\n"
         "• 📱 Лендинги, дашборды, бренд-пакеты\n"
         "• 🔗 Комплексные решения: сайт + бот + дизайн\n\n"
-        "<i>Выберите интересующий раздел:</i>"
+        "<i>Нажмите кнопку «Начать», чтобы продолжить 👇</i>"
     )
     
     # Пробуем отправить фото, если есть
@@ -111,13 +135,37 @@ async def cmd_start(message: types.Message):
     if avatar_path.exists():
         try:
             photo = FSInputFile(avatar_path)
-            await message.answer_photo(photo=photo, caption=text, reply_markup=main_keyboard())
+            await message.answer_photo(
+                photo=photo, 
+                caption=text, 
+                reply_markup=start_keyboard()
+            )
         except Exception as e:
             logger.error(f"Ошибка при отправке аватара: {e}")
-            await message.answer(text, reply_markup=main_keyboard())
+            await message.answer(text, reply_markup=start_keyboard())
     else:
         logger.warning(f"Аватар не найден: {avatar_path}")
-        await message.answer(text, reply_markup=main_keyboard())
+        await message.answer(text, reply_markup=start_keyboard())
+
+@dp.message(F.text == "🚀 Начать")
+async def handle_start_button(message: types.Message):
+    """Обработка нажатия кнопки 'Начать'"""
+    text = (
+        "<b>🏠 Главное меню</b>\n\n"
+        "Выберите интересующий раздел 👇"
+    )
+    
+    # Убираем Reply-клавиатуру и показываем инлайн-меню
+    await message.answer(
+        text, 
+        reply_markup=remove_keyboard()
+    )
+    
+    # Показываем инлайн-меню
+    await message.answer(
+        text, 
+        reply_markup=main_inline_keyboard()
+    )
 
 # ----- ОБРАБОТЧИКИ КАТЕГОРИЙ -----
 @dp.callback_query(F.data == "category_bot")
@@ -170,13 +218,10 @@ async def about(callback: types.CallbackQuery):
     )
     
     try:
-        if callback.message.photo:
-            await callback.message.answer(text, reply_markup=back_keyboard())
-        else:
-            await callback.message.edit_text(text, reply_markup=back_keyboard())
+        await callback.message.edit_text(text, reply_markup=back_inline_keyboard())
     except Exception as e:
         logger.error(f"Ошибка в about: {e}")
-        await callback.message.answer(text, reply_markup=back_keyboard())
+        await callback.message.answer(text, reply_markup=back_inline_keyboard())
     
     await callback.answer()
 
@@ -243,29 +288,23 @@ async def contacts(callback: types.CallbackQuery):
     )
     
     try:
-        if callback.message.photo:
-            await callback.message.answer(text, reply_markup=back_keyboard())
-        else:
-            await callback.message.edit_text(text, reply_markup=back_keyboard())
+        await callback.message.edit_text(text, reply_markup=back_inline_keyboard())
     except Exception as e:
         logger.error(f"Ошибка в contacts: {e}")
-        await callback.message.answer(text, reply_markup=back_keyboard())
+        await callback.message.answer(text, reply_markup=back_inline_keyboard())
     
     await callback.answer()
 
 @dp.callback_query(F.data == "back_to_main")
 async def back_to_main(callback: types.CallbackQuery):
     """Возврат в главное меню"""
-    text = "<b>🏠 Главное меню</b>\n\nЧем я могу вам помочь?"
+    text = "<b>🏠 Главное меню</b>\n\nВыберите интересующий раздел 👇"
     
     try:
-        if callback.message.photo:
-            await callback.message.answer(text, reply_markup=main_keyboard())
-        else:
-            await callback.message.edit_text(text, reply_markup=main_keyboard())
+        await callback.message.edit_text(text, reply_markup=main_inline_keyboard())
     except Exception as e:
         logger.error(f"Ошибка в back_to_main: {e}")
-        await callback.message.answer(text, reply_markup=main_keyboard())
+        await callback.message.answer(text, reply_markup=main_inline_keyboard())
     
     await callback.answer()
 
@@ -328,6 +367,13 @@ async def main():
         print("Проверьте пути в portfolio.py и наличие файлов в папке screens/")
     else:
         print("\n✅ Все картинки найдены!")
+    
+    # Проверяем наличие аватара
+    avatar_path = BASE_DIR / "screens" / "avatar.jpg"
+    if avatar_path.exists():
+        print("\n✅ Аватар найден!")
+    else:
+        print("\n⚠️ Аватар не найден: screens/avatar.jpg")
     
     print("\n" + "=" * 50)
     print("🎉 Бот готов к работе!")
