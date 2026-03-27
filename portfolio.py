@@ -1,13 +1,15 @@
 # portfolio.py
 
-PORTFOLIO = {
+# ========== РАЗРАБОТКА БОТОВ ==========
+BOT_PROJECTS = {
     "parser": {
         "name": "⚡️ Бот-парсер вакансий на hh.ru",
         "description": "Собирает данные с сайта hh.ru о вакансиях. Можно ознакомиться с ним по ссылке: @freelance_hunter_parser_bot",
         "tech": "Python, aiogram, sqlite, scheduler",
         "screens": "screens/hhparse.png",
         "price": "от 5 000 ₽",
-        "duration": "1 неделя"
+        "duration": "1 неделя",
+        "category": "bot"
     },
     "booking": {
         "name": "📊 Бот для записи в салон красоты",
@@ -15,8 +17,13 @@ PORTFOLIO = {
         "tech": "Python, aiogram, sqlite, apscheduler",
         "screens": "screens/bron.png",
         "price": "от 10 000 ₽",
-        "duration": "1 неделя"
-    },
+        "duration": "1 неделя",
+        "category": "bot"
+    }
+}
+
+# ========== ДИЗАЙН-ПРОЕКТЫ ==========
+DESIGN_PROJECTS = {
     "card_infographic": {
         "name": "🛍 Карточка товара | Инфографика",
         "description": "Техничная карточка с акцентом на характеристики: размерная сетка, состав, уход. Идеально для товаров с четкими параметрами.",
@@ -28,16 +35,16 @@ PORTFOLIO = {
     },
     "brand_pack": {
         "name": "🎨 Бренд-пакет для кофейни",
-        "description": "<Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
-        "tech": "Kandinsky, QWEN, , Supa, Figma",
+        "description": "Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
+        "tech": "Kandinsky, QWEN, Supa, Figma",
         "screens": "screens/coffee.png",
         "price": "от 2 000 ₽",
         "duration": "1-2 дня",
         "category": "design"
     },
-    "card-sale": {
-        "name": "📱 Карточка товара",
-        "description": "Продающий лендинг для школы программирования. Адаптив под мобильные, форма записи, интеграция с Telegram-ботом.",
+    "card_sale": {
+        "name": "🛍 Карточка товара | Lifestyle",
+        "description": "Яркая карточка товара с акцентом на продажи. Адаптив под мобильные, акцент на цену и преимущества.",
         "tech": "Figma, QWEN, Supa",
         "screens": "screens/dress.png", 
         "price": "от 500 ₽/карточка",
@@ -46,7 +53,7 @@ PORTFOLIO = {
     }
 }
 
-# Объединяем для обратной совместимости (если где-то используется PORTFOLIO)
+# Объединяем все проекты в один словарь для обратной совместимости
 PORTFOLIO = {**BOT_PROJECTS, **DESIGN_PROJECTS}
 
 # Функции для работы с категориями
