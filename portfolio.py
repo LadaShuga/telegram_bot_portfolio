@@ -46,8 +46,28 @@ PORTFOLIO = {
     }
 }
 
+# Объединяем для обратной совместимости (если где-то используется PORTFOLIO)
+PORTFOLIO = {**BOT_PROJECTS, **DESIGN_PROJECTS}
+
+# Функции для работы с категориями
+def get_projects_by_category(category=None):
+    """Возвращает проекты по категории (bot/design/all)"""
+    if category == "bot":
+        return BOT_PROJECTS
+    elif category == "design":
+        return DESIGN_PROJECTS
+    else:
+        return PORTFOLIO
+
+def get_categories():
+    """Возвращает список категорий"""
+    return [
+        {"id": "bot", "name": "🤖 Разработка ботов", "emoji": "🤖"},
+        {"id": "design", "name": "🎨 Дизайн", "emoji": "🎨"}
+    ]
+
 def get_portfolio():
-    """Возвращает список проектов для портфолио в виде списка словарей"""
+    """Возвращает список проектов для портфолио (для обратной совместимости)"""
     projects = []
     for key, project in PORTFOLIO.items():
         projects.append({
@@ -57,6 +77,7 @@ def get_portfolio():
             "technologies": project["tech"],
             "price": project["price"],
             "duration": project["duration"],
-            "key": key
+            "key": key,
+            "category": project.get("category", "bot")
         })
     return projects
