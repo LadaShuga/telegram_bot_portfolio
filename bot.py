@@ -4,7 +4,6 @@ import os
 from pathlib import Path
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command, CommandStart
-from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, FSInputFile, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.enums import ParseMode
@@ -155,7 +154,7 @@ async def handle_start_button(message: types.Message):
         "Выберите интересующий раздел 👇"
     )
     
-    # Убираем Reply-клавиатуру и показываем инлайн-меню
+    # Убираем Reply-клавиатуру
     await message.answer(
         text, 
         reply_markup=remove_keyboard()
@@ -301,9 +300,11 @@ async def back_to_main(callback: types.CallbackQuery):
     text = "<b>🏠 Главное меню</b>\n\nВыберите интересующий раздел 👇"
     
     try:
+        # Пробуем отредактировать существующее сообщение
         await callback.message.edit_text(text, reply_markup=main_inline_keyboard())
     except Exception as e:
-        logger.error(f"Ошибка в back_to_main: {e}")
+        # Если не получилось отредактировать (нет текста для редактирования), отправляем новое
+        logger.warning(f"Не удалось отредактировать сообщение: {e}")
         await callback.message.answer(text, reply_markup=main_inline_keyboard())
     
     await callback.answer()
@@ -313,6 +314,13 @@ async def main():
     """Запуск бота"""
     print("🚀 Бот-визитка запущен!")
     print("=" * 50)
+    
+    # Принудительно удаляем вебхук и сбрасываем ожидающие обновления
+    try:
+        await bot.delete_webhook(drop_pending_updates=True)
+        print("✅ Вебхук удален, начинаем polling...")
+    except Exception as e:
+        print(f"⚠️ Ошибка при удалении вебхука: {e}")
     
     try:
         me = await bot.me()
