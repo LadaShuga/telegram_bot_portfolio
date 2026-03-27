@@ -17,6 +17,33 @@ PORTFOLIO = {
         "price": "от 10 000 ₽",
         "duration": "1 неделя"
     }
+    "card_infographic": {
+        "name": "🛍 Карточка товара | Инфографика",
+        "description": "Техничная карточка с акцентом на характеристики: размерная сетка, состав, уход. Идеально для товаров с четкими параметрами.",
+        "tech": "Figma, Supa, QWEN",
+        "screens": "screens/", #вставить картинку
+        "price": "от 500 ₽/карточка",
+        "duration": "от 1 часа",
+        "category": "design"
+    },
+    "brand_pack": {
+        "name": "🎨 Бренд-пакет для кофейни",
+        "description": "<Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
+        "tech": "Kandinsky, QWEN, , Supa, Figma",
+        "screens": "screens/",#добавить картинку
+        "price": "от 2 000 ₽",
+        "duration": "1-2 дня",
+        "category": "design"
+    },
+    "card-sale": {
+        "name": "📱 Карточка товара",
+        "description": "Продающий лендинг для школы программирования. Адаптив под мобильные, форма записи, интеграция с Telegram-ботом.",
+        "tech": "Figma, QWEN, Supa",
+        "screens": "screens/", #добдавить картинку
+        "price": "от 500 ₽/карточка",
+        "duration": "от 1 часа",
+        "category": "design"
+    }
 }
 
 def get_portfolio():
