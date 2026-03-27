@@ -21,7 +21,7 @@ PORTFOLIO = {
         "name": "🛍 Карточка товара | Инфографика",
         "description": "Техничная карточка с акцентом на характеристики: размерная сетка, состав, уход. Идеально для товаров с четкими параметрами.",
         "tech": "Figma, Supa, QWEN",
-        "screens": "screens/", #вставить картинку
+        "screens": "screens/skirt.png", 
         "price": "от 500 ₽/карточка",
         "duration": "от 1 часа",
         "category": "design"
@@ -30,7 +30,7 @@ PORTFOLIO = {
         "name": "🎨 Бренд-пакет для кофейни",
         "description": "<Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
         "tech": "Kandinsky, QWEN, , Supa, Figma",
-        "screens": "screens/",#добавить картинку
+        "screens": "screens/coffee.png",
         "price": "от 2 000 ₽",
         "duration": "1-2 дня",
         "category": "design"
@@ -39,7 +39,7 @@ PORTFOLIO = {
         "name": "📱 Карточка товара",
         "description": "Продающий лендинг для школы программирования. Адаптив под мобильные, форма записи, интеграция с Telegram-ботом.",
         "tech": "Figma, QWEN, Supa",
-        "screens": "screens/", #добдавить картинку
+        "screens": "screens/dress.png", 
         "price": "от 500 ₽/карточка",
         "duration": "от 1 часа",
         "category": "design"
