@@ -3,7 +3,7 @@
 # ========== РАЗРАБОТКА БОТОВ ==========
 BOT_PROJECTS = {
     "parser": {
-        "name": "⚡️ Бот-парсер вакансий на hh.ru",
+        "name": "Бот-парсер вакансий на hh.ru",
         "description": "Собирает данные с сайта hh.ru о вакансиях. Можно ознакомиться с ним по ссылке: @freelance_hunter_parser_bot",
         "tech": "Python, aiogram, sqlite, scheduler",
         "screens": "screens/hhparse.png",
@@ -12,7 +12,7 @@ BOT_PROJECTS = {
         "category": "bot"
     },
     "booking": {
-        "name": "📊 Бот для записи в салон красоты",
+        "name": "Бот для записи в салон красоты",
         "description": "Бот предназначен для онлайн-записи в салон красоты. Можно ознакомиться с ним по ссылке: @TestBookingbot_bot",
         "tech": "Python, aiogram, sqlite, apscheduler",
         "screens": "screens/bron.png",
@@ -25,7 +25,7 @@ BOT_PROJECTS = {
 # ========== ДИЗАЙН-ПРОЕКТЫ ==========
 DESIGN_PROJECTS = {
     "card_infographic": {
-        "name": "🛍 Карточка товара | Инфографика",
+        "name": "Карточка товара | Инфографика",
         "description": "Техничная карточка с акцентом на характеристики: размерная сетка, состав, уход. Идеально для товаров с четкими параметрами.",
         "tech": "Figma, Supa, QWEN",
         "screens": "screens/skirt.png", 
@@ -34,7 +34,7 @@ DESIGN_PROJECTS = {
         "category": "design"
     },
     "brand_pack": {
-        "name": "🎨 Бренд-пакет для кофейни",
+        "name": "Бренд-пакет для кофейни",
         "description": "Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
         "tech": "Kandinsky, QWEN, Supa, Figma",
         "screens": "screens/coffee.png",
@@ -43,7 +43,7 @@ DESIGN_PROJECTS = {
         "category": "design"
     },
     "card_sale": {
-        "name": "🛍 Карточка товара | Lifestyle",
+        "name": "Карточка товара | Lifestyle",
         "description": "Яркая карточка товара с акцентом на продажи. Адаптив под мобильные, акцент на цену и преимущества.",
         "tech": "Figma, QWEN, Supa",
         "screens": "screens/dress.png", 
