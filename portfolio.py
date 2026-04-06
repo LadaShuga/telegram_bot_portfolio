@@ -23,6 +23,7 @@ BOT_PROJECTS = {
 }
 
 # ========== ДИЗАЙН-ПРОЕКТЫ ==========
+# ========== ДИЗАЙН-ПРОЕКТЫ ==========
 DESIGN_PROJECTS = {
     "card_infographic": {
         "name": "Карточка товара | Инфографика",
@@ -50,6 +51,20 @@ DESIGN_PROJECTS = {
         "price": "от 500 ₽/карточка",
         "duration": "от 1 часа",
         "category": "design"
+    },
+    "kvn_posters": {
+        "name": "Афиши КВН | Серия работ",
+        "description": "Серия афиш для игр и фестивалей КВН. В работе использованы: яркие цвета, динамичная композиция, фотоколлаж. Задача — привлечь зрителей и передать атмосферу праздника.",
+        "tech": "Photoshop, Figma, Supa",
+        "screens": [
+            "screens/kvn_poster_1.png",
+            "screens/kvn_poster_2.png",
+            "screens/kvn_poster_3.png"
+        ],
+        "price": "от 1 000 ₽",
+        "duration": "1-2 дня",
+        "category": "design",
+        "is_album": True
     }
 }
 
