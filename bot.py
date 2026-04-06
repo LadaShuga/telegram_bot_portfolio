@@ -211,9 +211,10 @@ async def about(callback: types.CallbackQuery):
 
 @dp.callback_query(F.data.startswith("project_"))
 async def show_project(callback: types.CallbackQuery):
-    """Детали конкретного проекта"""
+    """Детали конкретного проекта с картинкой (или альбомом)"""
     project_key = callback.data.replace("project_", "")
     
+    # Ищем проект в обоих словарях
     project = BOT_PROJECTS.get(project_key) or DESIGN_PROJECTS.get(project_key)
     
     if not project:
@@ -231,29 +232,60 @@ async def show_project(callback: types.CallbackQuery):
         f"<i>Хотите такой же проект? Напишите мне!</i>"
     )
     
-    image_path = project.get("screens")
+    screens = project.get("screens")
     
-    if image_path:
-        full_image_path = BASE_DIR / image_path
-        if full_image_path.exists():
-            try:
-                photo = FSInputFile(full_image_path)
-                await callback.message.answer_photo(
-                    photo=photo,
-                    caption=text,
-                    reply_markup=project_keyboard(project_key, project)
-                )
-            except Exception as e:
-                logger.error(f"Ошибка отправки фото: {e}")
+    # Проверяем, это альбом или одно фото
+    if screens:
+        # Если screens - это список (альбом)
+        if isinstance(screens, list):
+            media_group = []
+            for img_path in screens:
+                full_image_path = BASE_DIR / img_path
+                if full_image_path.exists():
+                    media_group.append(
+                        types.InputMediaPhoto(media=FSInputFile(full_image_path))
+                    )
+                else:
+                    logger.warning(f"Файл {full_image_path} не найден")
+            
+            if media_group:
+                try:
+                    # Отправляем альбом с фото
+                    await callback.message.answer_media_group(media_group)
+                    # Отправляем текст после фото
+                    await callback.message.answer(
+                        text, 
+                        reply_markup=project_keyboard(project_key, project)
+                    )
+                except Exception as e:
+                    logger.error(f"Ошибка при отправке альбома: {e}")
+                    await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
+            else:
+                await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
+        
+        # Если screens - это строка (одно фото)
+        elif isinstance(screens, str):
+            full_image_path = BASE_DIR / screens
+            if full_image_path.exists():
+                try:
+                    photo = FSInputFile(full_image_path)
+                    await callback.message.answer_photo(
+                        photo=photo,
+                        caption=text,
+                        reply_markup=project_keyboard(project_key, project)
+                    )
+                except Exception as e:
+                    logger.error(f"Ошибка при отправке картинки: {e}")
+                    await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
+            else:
+                logger.warning(f"Файл {full_image_path} не найден")
                 await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
         else:
-            logger.warning(f"Файл {full_image_path} не найден")
             await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
     else:
         await callback.message.answer(text, reply_markup=project_keyboard(project_key, project))
     
     await callback.answer()
-
 
 @dp.callback_query(F.data == "contacts")
 async def contacts(callback: types.CallbackQuery):
