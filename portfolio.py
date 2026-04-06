@@ -56,9 +56,10 @@ DESIGN_PROJECTS = {
         "description": "Серия афиш для игр и фестивалей КВН. В работе использованы: яркие цвета, динамичная композиция, фотоколлаж. Задача — привлечь зрителей и передать атмосферу праздника.",
         "tech": "Photoshop, Figma, Supa",
         "screens": [
-            "screens/kvn_poster_1.png",
-            "screens/kvn_poster_2.png",
-            "screens/kvn_poster_3.png"
+            "screens/kvn1.png",
+            "screens/kvn2.png",
+            "screens/kvn3.png",
+            "screens/logo_kvn.png
         ],
         "price": "от 1 000 ₽",
         "duration": "1-2 дня",
