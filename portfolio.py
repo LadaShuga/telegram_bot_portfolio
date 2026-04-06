@@ -59,7 +59,7 @@ DESIGN_PROJECTS = {
             "screens/kvn1.png",
             "screens/kvn2.png",
             "screens/kvn3.png",
-            "screens/logo_kvn.png
+            "screens/logo_kvn.png"
         ],
         "price": "от 1 000 ₽",
         "duration": "1-2 дня",
