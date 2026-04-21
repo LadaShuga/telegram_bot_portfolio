@@ -28,16 +28,16 @@ DESIGN_PROJECTS = {
         "name": "Карточка товара | Инфографика",
         "description": "Техничная карточка с акцентом на характеристики: размерная сетка, состав, уход. Идеально для товаров с четкими параметрами.",
         "tech": "Figma, Supa, QWEN",
-        "screens": "screens/skirt.png", 
+        "screens": "screens/ДЗ 3.png", 
         "price": "от 500 ₽/карточка",
         "duration": "от 1 часа",
         "category": "design"
     },
     "brand_pack": {
-        "name": "Бренд-пакет для кофейни",
-        "description": "Бренд-пакет для кофейни - логотип, мокапы, макет визитки",
-        "tech": "Kandinsky, QWEN, Supa, Figma",
-        "screens": "screens/coffee.png",
+        "name": "Запретграмм-пост для NFT-магазина",
+        "description": "Запретграмм-пост для NFT-магазина",
+        "tech": "QWEN, Figma",
+        "screens": "screens/Instarfam post - 1.png",
         "price": "от 2 000 ₽",
         "duration": "1-2 дня",
         "category": "design"
@@ -46,7 +46,7 @@ DESIGN_PROJECTS = {
         "name": "Карточка товара | Lifestyle",
         "description": "Яркая карточка товара с акцентом на продажи. Адаптив под мобильные, акцент на цену и преимущества.",
         "tech": "Figma, QWEN, Supa",
-        "screens": "screens/dress.png", 
+        "screens": "screens/.png", 
         "price": "от 500 ₽/карточка",
         "duration": "от 1 часа",
         "category": "design"
