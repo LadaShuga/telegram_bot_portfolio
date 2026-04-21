@@ -37,7 +37,7 @@ DESIGN_PROJECTS = {
         "name": "Запретграмм-пост для NFT-магазина",
         "description": "Запретграмм-пост для NFT-магазина",
         "tech": "QWEN, Figma",
-        "screens": "screens/NFT.png",
+        "screens": "screens/NFT2.png",
         "price": "от 2 000 ₽",
         "duration": "1-2 дня",
         "category": "design"
