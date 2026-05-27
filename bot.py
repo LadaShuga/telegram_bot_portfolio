@@ -92,9 +92,9 @@ def project_keyboard(project_key, project):
     
     # Кнопка заказа
     if project.get("category") == "design":
-        buttons.append([InlineKeyboardButton(text="🎨 Заказать дизайн", url="https://t.me/shuga_dev")])
+        buttons.append([InlineKeyboardButton(text="🎨 Заказать дизайн", url="https://t.me/lada_pieceof_hell")])
     else:
-        buttons.append([InlineKeyboardButton(text="🤖 Заказать бота", url="https://t.me/shuga_dev")])
+        buttons.append([InlineKeyboardButton(text="🤖 Заказать бота", url="https://t.me/lada_pieceof_hell")])
     
     # Кнопка назад к списку проектов
     if project.get("category") == "design":
@@ -292,7 +292,7 @@ async def contacts(callback: types.CallbackQuery):
     """Контакты"""
     text = (
         "<b>📞 Контакты</b>\n\n"
-        "📱 <b>Telegram:</b> @shuga_dev\n"
+        "📱 <b>Telegram:</b> @lada_pieceof_hell\n"
         "📧 <b>Email:</b> ladashuga@mail.ru\n"
         "💼 <b>GitHub:</b> https://github.com/LadaShuga\n\n"
         "<i>Пишите, буду рада обсудить ваш проект!</i>"
